@@ -3,6 +3,7 @@ var Sidebar = Sidebar || {};
 (function (MapPane) {
   let $btnAddLayer = $("#btn-add-layer");
   let $dataInputField = $("#data-input-field");
+  let $selectDataType = $("#select-data-type");
 
   Sidebar._getInputFieldInnerText = function () {
     return $dataInputField.val();
@@ -20,12 +21,33 @@ var Sidebar = Sidebar || {};
     return latlngs;
   };
 
+  Sidebar._splitLines = function (text) {
+    let lines = text.split(/[\n]+/);
+    return lines;
+  };
+
 
   Sidebar._handleClickAddLayer = function  (e) {
     e.preventDefault();
     let innerText = Sidebar._getInputFieldInnerText();
-    let latlngs = Sidebar._parseCoordinateText(innerText);
-    MapPane.renderPointLayer(latlngs);
+    let dataType = $selectDataType.find(":selected");
+
+    switch (dataType.val()) {
+      case "GeoJSON":
+        console.log()
+        break;
+      case "Coordinates (Longitude-Latitude)":
+        let latlngs = Sidebar._parseCoordinateText(innerText);
+        MapPane.renderPointLayer(latlngs);
+        break;
+      case "Lines (WKT)":
+        let lines = innerText.split("\n");
+        MapPane.renderLineLayer(lines);
+        break;
+      default:
+        cosole.error("Invalid data type")
+    }
+    return false;
   }
 
   $btnAddLayer.on('click', Sidebar._handleClickAddLayer)

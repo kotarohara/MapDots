@@ -25,13 +25,55 @@ var MapPane = MapPane || {};
     return geojson;
   }
 
+  MapPane.renderLineLayer = function (wktLines) {
+      console.assert(wktLines.length > 0);
+      let layerName = "layer-line-" + layerIndex;
+      let sourceName = "source-line-" + layerIndex;
+      layerIndex += 1;
+
+      var wkt = new Wkt.Wkt()
+      var features = wktLines.map(function (line) {
+        wkt.read(line);
+        return {
+          "type": "Feature",
+          "properties": {},
+          "geometry": wkt.toJson()
+        };
+      });
+
+      let geojson = {
+            "type": "geojson",
+            "data": {
+                "type": "FeatureCollection",
+                "features": features
+            }
+      };
+
+
+      MapPane.map.addSource(sourceName, geojson);
+      MapPane.map.addLayer({
+        "id": sourceName,
+        "type": "line",
+        "source": sourceName,
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#888",
+            "line-width": 3
+        }
+      });
+  };
+
   MapPane.renderPointLayer = function (latlngs) {
     console.assert(latlngs.length > 0);
     let layerName = "layer-point-" + layerIndex;
+    let sourceName = "source-point-" + layerIndex;
     layerIndex += 1;
 
     let geojson = MapPane._latLngsToGeoJSON(latlngs);
-    let sourceName = "source-point-" + layerIndex;
+
     MapPane.map.addSource(sourceName, geojson);
     MapPane.map.addLayer({
       "id": sourceName,
@@ -43,42 +85,11 @@ var MapPane = MapPane || {};
         "circle-stroke-color": "#ffffff",
         "circle-stroke-width": 3
       }
-    })
+    });
   }
 
 
   function handleMapOnLoad () {
-      let latlngs = [[-79.943441, 40.443434], [-79.9238901390978, 40.4]];
-      MapPane.renderPointLayer(latlngs);
-
-    //   map.addSource("route", {
-    //     "type": "geojson",
-    //     "data": {
-    //         "type": "Feature",
-    //         "properties": {},
-    //         "geometry": {
-    //             "type": "LineString",
-    //             "coordinates": [
-    //                 [-79.943441, 40.443434],
-    //                 [-79.9238901390978, 40.4]
-    //             ]
-    //         }
-    //     }
-    // });
-    //
-    // map.addLayer({
-    //     "id": "route",
-    //     "type": "line",
-    //     "source": "route",
-    //     "layout": {
-    //         "line-join": "round",
-    //         "line-cap": "round"
-    //     },
-    //     "paint": {
-    //         "line-color": "#000000",
-    //         "line-width": 5
-    //     }
-    // });
   }
 
   map.on('load', handleMapOnLoad);

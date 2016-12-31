@@ -4,6 +4,7 @@
 <script src='https://api.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.css' rel='stylesheet' />
 <script src='lib/turf.min.js'></script>
+<script src='lib/wicket.js'></script>
 <link rel="stylesheet" href="lib/photon/css/photon.css" />
 <link rel="stylesheet" href="styles/main.css" />
 <script src='lib/underscore-min.js'></script>
@@ -19,8 +20,27 @@
       <div class="pane-one-fourth sidebar">
         <nav class="nav-group">
 
+          <!-- Data -->
+          <h1 class="nav-group-title">Data</h5>
+          <!--  -->
+            <form style="padding: 10px;">
+              <div class="form-group">
+                <textarea id="data-input-field" class="form-control" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <select id="select-data-type" class="form-control">
+                  <option>Coordinates (Longitude-Latitude)</option>
+                  <option>Lines (WKT)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <button id="btn-add-layer" class="btn btn-default">Add Layer</button>
+              </div>
+            </form>
+          <!-- End Data -->
+
           <!-- Layers -->
-          <h5 class="nav-group-title">Layers</h5>
+          <h5 class="nav-group-title">Layers (TODO)</h5>
           <ul class="list-group">
             <li class="list-group-item">
               <div class="media-body">
@@ -36,26 +56,7 @@
             </li>
           </ul>
           <!-- End Layers -->
-
-          <!-- Data -->
-          <h5 class="nav-group-title">Data</h5>
-          <!--  -->
-            <form style="padding: 10px;">
-              <div class="form-group">
-               <textarea id="data-input-field" class="form-control" rows="3"></textarea>
-             </div>
-             <select class="form-control">
-               <option>Coordinates (Longitude-Latitude)</option>
-               <option>Lines (WKT)</option>
-             </select>
-            <button id="btn-add-layer" class="btn btn-default" style="padding-left: 10px;">Add Layer</button>
-            </form>
-
-
-          <!-- End Data -->
         </nav>
-
-
       </div>
       <!-- End Sidebar -->
 
