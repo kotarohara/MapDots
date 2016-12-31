@@ -1,139 +1,83 @@
-<style>
-body, html {
-    margin: 0px;
-    padding: 0px;
-}
-</style>
-<link rel="stylesheet" href="styles/split.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/github.min.css">
-
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.css' rel='stylesheet' />
+<script src='lib/turf.min.js'></script>
+<link rel="stylesheet" href="lib/photon/css/photon.css" />
+<link rel="stylesheet" href="styles/main.css" />
+<script src='lib/underscore-min.js'></script>
+<script src='lib/backbone-min.js'></script>
+<script src='lib/jquery-1.9.1.js'></script>
 
 <body>
+<div class="window">
+  <div class="window-content">
+    <div class="pane-group">
+
+      <!-- Sidebar -->
+      <div class="pane-one-fourth sidebar">
+        <nav class="nav-group">
+
+          <!-- Layers -->
+          <h5 class="nav-group-title">Layers</h5>
+          <ul class="list-group">
+            <li class="list-group-item">
+              <div class="media-body">
+                <strong>Layer title</strong>
+                <p>Data summary</p>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="media-body">
+                <strong>Layer title</strong>
+                <p>Data summary</p>
+              </div>
+            </li>
+          </ul>
+          <!-- End Layers -->
+
+          <!-- Data -->
+          <h5 class="nav-group-title">Data</h5>
+          <!--  -->
+            <form style="padding: 10px;">
+              <div class="form-group">
+               <textarea id="data-input-field" class="form-control" rows="3"></textarea>
+             </div>
+             <select class="form-control">
+               <option>Coordinates (Longitude-Latitude)</option>
+               <option>Lines (WKT)</option>
+             </select>
+            <button id="btn-add-layer" class="btn btn-default" style="padding-left: 10px;">Add Layer</button>
+            </form>
+
+
+          <!-- End Data -->
+        </nav>
+
+
+      </div>
+      <!-- End Sidebar -->
+
+      <!-- Map -->
+      <div class="pane">
+        <div id='map' style='width: 100%; height: 100%;'></div>
+      </div>
+      <!-- End Map -->
+
+    </div>
+  </div>
+</div>
+
   <div id='left-menu-holder' class="split split-horizontal" style="width: 25%;">
     <textarea id="input-field" style="width: 100%; height: 90%; border: 1px solid #ddd; padding: 0; spacing: 0;"></textarea>
     <button id="input-field-ok-button" onclick="handleClickOK()">OK</button>
   </div>
   <div id='map-holder' class="split split-horizontal">
-      <div id='map' style='width: 100%; height: 100%;'></div>
+
   </div>
 </body>
 
-<script src='https://api.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.css' rel='stylesheet' />
-<script src='scripts/turf.min.js'></script>
-<script src='scripts/split.min.js'></script>
-
-<script>
-  Split(['#left-menu-holder', '#map-holder'], {
-      sizes: ["calc(25% - 3px)", "75%"],
-      gutterSize: 0,
-      minSize: [100, 300]
-  });
-
-  mapboxgl.accessToken = 'pk.eyJ1Ijoia290YXJvaGFyYSIsImEiOiJDdmJnOW1FIn0.kJV65G6eNXs4ATjWCtkEmA';
-  var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
-    zoom: 14,
-    center: [-79.943441, 40.443434]
-  });
-
-  function getInputFieldInnerText() {
-    let inputField = document.getElementById("input-field");
-    return inputField.value;
-  }
-
-  function parseInnerText(text) {
-    let rows = text.split("\n");
-    let latlngs = rows.map(row => row.split(",").map(val => parseFloat(val)));
-    return latlngs;
-  }
-
-  var layerIndex = 0;
-  function handleClickOK () {
-    let layerName = "layer-" + layerIndex;
-    layerIndex += 1;
-
-    let sourceName = "source-" + layerIndex
-
-    // map.addSource(sourceName, latLngsToGeoJSON(latlngs));
-    let innerText = getInputFieldInnerText();
-    let latlngs = parseInnerText(innerText);
-    let geojson = latLngsToGeoJSON(latlngs);
-
-    map.addSource(sourceName, geojson);
-    map.addLayer({
-        "id": layerName,
-        "type": "circle",
-        "source": sourceName,
-        "paint": {
-          "circle-radius": 5,
-          "circle-color": "#007cbf",
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 3
-        }
-    });
-  }
-
-  function latLngsToGeoJSON(latlngs) {
-    let features = latlngs.map(c => turf.point(c));
-    let geojson = {
-          "type": "geojson",
-          "data": {
-              "type": "FeatureCollection",
-              "features": features
-          }
-      };
-    return geojson;
-  }
-
-  function handleMapOnLoad () {
-      let latlngs = [[-79.943441, 40.443434], [-79.9238901390978, 40.4]];
-      map.addSource("points", latLngsToGeoJSON(latlngs));
-
-      map.addLayer({
-          "id": "points",
-          "type": "circle",
-          "source": "points",
-          "paint": {
-            "circle-radius": 7,
-            "circle-color": "#007cbf",
-            "circle-stroke-color": "#ffffff",
-            "circle-stroke-width": 3
-          }
-      });
-
-    //   map.addSource("route", {
-    //     "type": "geojson",
-    //     "data": {
-    //         "type": "Feature",
-    //         "properties": {},
-    //         "geometry": {
-    //             "type": "LineString",
-    //             "coordinates": [
-    //                 [-79.943441, 40.443434],
-    //                 [-79.9238901390978, 40.4]
-    //             ]
-    //         }
-    //     }
-    // });
-    //
-    // map.addLayer({
-    //     "id": "route",
-    //     "type": "line",
-    //     "source": "route",
-    //     "layout": {
-    //         "line-join": "round",
-    //         "line-cap": "round"
-    //     },
-    //     "paint": {
-    //         "line-color": "#000000",
-    //         "line-width": 5
-    //     }
-    // });
-  }
-
-  map.on('load', handleMapOnLoad);
-</script>
+<script src="scripts/Main.js"></script>
+<script src="scripts/MapPane/MapPane.js"></script>
+<script src="scripts/Sidebar/Sidebar.js"></script>
