@@ -1,230 +1,117 @@
-// An example Backbone application contributed by
-// [Jérôme Gravel-Niquet](http://jgn.me/). This demo uses a simple
-// [LocalStorage adapter](backbone-localstorage.html)
-// to persist Backbone models within your browser.
+// Based on the example Backbone application that uses
+// [LocalStorage adapter](backbone-localstorage.html).
 
-// Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
+  var Layer = Backbone.Model.extend({
 
-  // Todo Model
-  // ----------
-
-  // Our basic **Todo** model has `title`, `order`, and `done` attributes.
-  var Todo = Backbone.Model.extend({
-
-    // Default attributes for the todo item.
     defaults: function() {
       return {
-        title: "empty todo...",
-        order: Todos.nextOrder(),
-        done: false
+        title: "empty layer...",
+        order: Layers.nextOrder(),
+        visible: false
       };
     },
 
-    // Ensure that each todo created has `title`.
     initialize: function() {
       if (!this.get("title")) {
         this.set({"title": this.defaults().title});
       }
     },
 
-    // Toggle the `done` state of this todo item.
     toggle: function() {
-      this.save({done: !this.get("done")});
+      this.save({visible: !this.get("visible")});
     }
 
   });
 
-  // Todo Collection
-  // ---------------
+  var LayerList = Backbone.Collection.extend({
 
-  // The collection of todos is backed by *localStorage* instead of a remote
-  // server.
-  var TodoList = Backbone.Collection.extend({
+    model: Layer,
 
-    // Reference to this collection's model.
-    model: Todo,
+    localStorage: new Backbone.LocalStorage("layers-backbone"),
 
-    // Save all of the todo items under the `"todos-backbone"` namespace.
-    localStorage: new Backbone.LocalStorage("todos-backbone"),
-
-    // Filter down the list of all todo items that are finished.
-    done: function() {
-      return this.filter(function(todo){ return todo.get('done'); });
+    visible: function() {
+      return this.filter(function(layer){ return layer.get('visible'); });
     },
 
-    // Filter down the list to only todo items that are still not finished.
-    remaining: function() {
-      return this.without.apply(this, this.done());
-    },
-
-    // We keep the Todos in sequential order, despite being saved by unordered
-    // GUID in the database. This generates the next order number for new items.
     nextOrder: function() {
       if (!this.length) return 1;
       return this.last().get('order') + 1;
     },
 
-    // Todos are sorted by their original insertion order.
-    comparator: function(todo) {
-      return todo.get('order');
+    comparator: function(layer) {
+      return layer.get('order');
     }
 
   });
 
-  // Create our global collection of **Todos**.
-  var Todos = new TodoList;
+  var Layers = new LayerList;
 
-  // Todo Item View
-  // --------------
+  var LayerView = Backbone.View.extend({
 
-  // The DOM element for a todo item...
-  var TodoView = Backbone.View.extend({
-
-    //... is a list tag.
     tagName:  "li",
 
-    // Cache the template function for a single item.
-    template: _.template($('#item-template').html()),
+    template: _.template($('#layer-template').html()),
 
-    // The DOM events specific to an item.
     events: {
-      "click .toggle"   : "toggleDone",
-      "dblclick .view"  : "edit",
-      "click a.destroy" : "clear",
-      "keypress .edit"  : "updateOnEnter",
-      "blur .edit"      : "close"
+      "click .toggle"   : "toggleShow",
+      "click a.destroy" : "clear"
     },
 
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
     initialize: function() {
       this.listenTo(this.model, 'change', this.render);
       this.listenTo(this.model, 'destroy', this.remove);
     },
 
-    // Re-render the titles of the todo item.
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
-      this.$el.toggleClass('done', this.model.get('done'));
-      this.input = this.$('.edit');
+      this.$el.toggleClass('visible', this.model.get('visible'));
       return this;
     },
 
-    // Toggle the `"done"` state of the model.
-    toggleDone: function() {
+    toggleShow: function() {
       this.model.toggle();
     },
 
-    // Switch this view into `"editing"` mode, displaying the input field.
-    edit: function() {
-      this.$el.addClass("editing");
-      this.input.focus();
-    },
-
-    // Close the `"editing"` mode, saving changes to the todo.
-    close: function() {
-      var value = this.input.val();
-      if (!value) {
-        this.clear();
-      } else {
-        this.model.save({title: value});
-        this.$el.removeClass("editing");
-      }
-    },
-
-    // If you hit `enter`, we're through editing the item.
-    updateOnEnter: function(e) {
-      if (e.keyCode == 13) this.close();
-    },
-
-    // Remove the item, destroy the model.
     clear: function() {
       this.model.destroy();
     }
 
   });
 
-  // The Application
-  // ---------------
-
-  // Our overall **AppView** is the top-level piece of UI.
   var AppView = Backbone.View.extend({
-
-    // Instead of generating a new element, bind to the existing skeleton of
-    // the App already present in the HTML.
-    el: $("#layer-holder"),
-
-    // Our template for the line of statistics at the bottom of the app.
-    // statsTemplate: _.template($('#stats-template').html()),
-
-    // Delegated events for creating new items, and clearing completed ones.
+    el: $("#app-window"),
     events: {
-      "keypress #new-todo":  "createOnEnter"
-      // "click #clear-completed": "clearCompleted"
+      "click #btn-add-layer": "createOnClick"
     },
 
-    // At initialization we bind to the relevant events on the `Todos`
-    // collection, when items are added or changed. Kick things off by
-    // loading any preexisting todos that might be saved in *localStorage*.
     initialize: function() {
-
-      this.input = this.$("#new-todo");
-      // this.allCheckbox = this.$("#toggle-all")[0];
-
-      this.listenTo(Todos, 'add', this.addOne);
-      this.listenTo(Todos, 'reset', this.addAll);
-      this.listenTo(Todos, 'all', this.render);
-
-      this.footer = this.$('footer');
+      this.option = this.$("#select-data-type :selected");
+      this.listenTo(Layers, 'add', this.addOne);
       this.main = $('#layer-main');
-
-      Todos.fetch();
+      Layers.fetch();
     },
 
-    // Re-rendering the App just means refreshing the statistics -- the rest
-    // of the app doesn't change.
     render: function() {
-      var done = Todos.done().length;
-      var remaining = Todos.remaining().length;
-
-      if (Todos.length) {
+      if (Layers.length) {
         this.main.show();
-        this.footer.show();
       } else {
         this.main.hide();
-        this.footer.hide();
       }
     },
 
-    // Add a single todo item to the list by creating a view for it, and
-    // appending its element to the `<ul>`.
-    addOne: function(todo) {
-      var view = new TodoView({model: todo});
+    addOne: function(layer) {
+      var view = new LayerView({model: layer});
       this.$("#layer-list").append(view.render().el);
     },
 
-    // Add all items in the **Todos** collection at once.
-    addAll: function() {
-      Todos.each(this.addOne, this);
-    },
+    // addAll: function() {
+    //   Layers.each(this.addOne, this);
+    // },
 
-    // If you hit return in the main input field, create new **Todo** model,
-    // persisting it to *localStorage*.
-    createOnEnter: function(e) {
-      if (e.keyCode != 13) return;
-      if (!this.input.val()) return;
-
-      Todos.create({title: this.input.val()});
-      this.input.val('');
+    createOnClick: function (e) {
+      Layers.create({title: this.option.val()});
     }
-
-    // Clear all done todo items, destroying their models.
-    // clearCompleted: function() {
-    //   _.invoke(Todos.done(), 'destroy');
-    //   return false;
-    // }
   });
 
   // Finally, we kick things off by creating the **App**.

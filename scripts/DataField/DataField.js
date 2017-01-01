@@ -47,7 +47,6 @@ var DataField = DataField || {};
       default:
         cosole.error("Invalid data type")
     }
-    return false;
   }
 
   $btnAddLayer.on('click', DataField._handleClickAddLayer)

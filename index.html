@@ -14,7 +14,7 @@
 
 <body>
 <div class="window">
-  <div class="window-content">
+  <div id="app-window" class="window-content">
     <div class="pane-group">
 
       <!-- Sidebar -->
@@ -45,9 +45,9 @@
         <nav id="layer-holder">
 
           <h5 class="nav-group-title">Layers (TODO)</h5>
-          <header>
-            <input id="new-todo" type="text" placeholder="What needs to be done?">
-          </header>
+          <!-- <header>
+            <input id="new-layer" type="text" placeholder="What needs to be done?">
+          </header> -->
           <section id="layer-main">
             <ul id="layer-list" class="list-group"></ul>
           </section>
@@ -76,7 +76,7 @@
   </div>
 </body>
 
-<script type="text/template" id="item-template">
+<script type="text/template" id="layer-template">
   <li class="list-group-item">
     <div class="media-body">
       <strong><%- title %></strong>
