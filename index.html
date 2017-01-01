@@ -7,9 +7,10 @@
 <script src='lib/wicket.js'></script>
 <link rel="stylesheet" href="lib/photon/css/photon.css" />
 <link rel="stylesheet" href="styles/main.css" />
+<script src='lib/jquery-1.9.1.js'></script>
 <script src='lib/underscore-min.js'></script>
 <script src='lib/backbone-min.js'></script>
-<script src='lib/jquery-1.9.1.js'></script>
+<script src='lib/backbone.localStorage-min.js'></script>
 
 <body>
 <div class="window">
@@ -38,25 +39,21 @@
               </div>
             </form>
           <!-- End Data -->
-
-          <!-- Layers -->
-          <h5 class="nav-group-title">Layers (TODO)</h5>
-          <ul class="list-group">
-            <li class="list-group-item">
-              <div class="media-body">
-                <strong>Layer title</strong>
-                <p>Data summary</p>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="media-body">
-                <strong>Layer title</strong>
-                <p>Data summary</p>
-              </div>
-            </li>
-          </ul>
-          <!-- End Layers -->
         </nav>
+
+        <!-- Layers -->
+        <nav id="layer-holder">
+
+          <h5 class="nav-group-title">Layers (TODO)</h5>
+          <header>
+            <input id="new-todo" type="text" placeholder="What needs to be done?">
+          </header>
+          <section id="layer-main">
+            <ul id="layer-list" class="list-group"></ul>
+          </section>
+        </nav>
+        <!-- End Layers -->
+
       </div>
       <!-- End Sidebar -->
 
@@ -79,6 +76,16 @@
   </div>
 </body>
 
+<script type="text/template" id="item-template">
+  <li class="list-group-item">
+    <div class="media-body">
+      <strong><%- title %></strong>
+      <p>Data summary | <a class="destroy">Remove Layer</a></p>
+    </div>
+  </li>
+</script>
+
 <script src="scripts/Main.js"></script>
 <script src="scripts/MapPane/MapPane.js"></script>
-<script src="scripts/Sidebar/Sidebar.js"></script>
+<script src="scripts/DataField/DataField.js"></script>
+<script src="scripts/Layer/Layer.js"></script>

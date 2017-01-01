@@ -1,6 +1,6 @@
 var MapPane = MapPane || {};
 
-(function (Sidebar) {
+(function (DataField) {
   var layerIndex = 0;
 
   mapboxgl.accessToken = 'pk.eyJ1Ijoia290YXJvaGFyYSIsImEiOiJDdmJnOW1FIn0.kJV65G6eNXs4ATjWCtkEmA';
@@ -93,4 +93,4 @@ var MapPane = MapPane || {};
   }
 
   map.on('load', handleMapOnLoad);
-})(Sidebar);
+})(DataField);

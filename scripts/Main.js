@@ -1,7 +1,9 @@
 var MapPane = MapPane || {};
-var Sidebar = Sidebar || {};
+var DataField = DataField || {};
+
+
 var Main = function () {
-  
+
 }
 
 Main();
